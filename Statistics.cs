@@ -2,19 +2,19 @@ namespace Codingame.Statistics
 {
     using System.Collections.Generic;
     using System.Linq;
-    using Codingame.Distances;
+    using Codingame.DistanceCalculations;
     using Codingame.Models;
 
     internal class Stats
     {
-        internal static List<NPCStatistic> GenerateStatistics(List<NPC> humans, List<NPC> zombies)
+        internal static List<HumanRawStatistic> GenerateRawStatistics(List<HumanNPC> humans, List<ZombieNPC> zombies)
         {
-            var npcStatistics = new List<NPCStatistic>();
+            var npcStatistics = new List<HumanRawStatistic>();
             foreach (var human in humans)
             {
                 foreach (var zombie in zombies)
                 {
-                    npcStatistics.Add(new NPCStatistic
+                    npcStatistics.Add(new HumanRawStatistic
                     {
                         Human = human,
                         Zombie = zombie,
@@ -28,7 +28,19 @@ namespace Codingame.Statistics
             return npcStatistics;
         }
 
-        internal static IEnumerable<NPCStatistic> PrioritizeHumans(List<NPCStatistic> npcStatistics) =>
+        internal static void Generate(List<HumanRawStatistic> humanStatistics)
+        {
+            var a = humanStatistics
+                .GroupBy(x => x.KilledInTurns)
+                .Select(x => x.Count());
+
+            foreach (var human in humanStatistics)
+            {
+
+            }
+        }
+
+        internal static IEnumerable<HumanRawStatistic> PrioritizeHumans(List<HumanRawStatistic> npcStatistics) =>
             npcStatistics
                 .Where(x => x.PossibleToSave)
                 .OrderBy(x => x.KilledInTurns)
