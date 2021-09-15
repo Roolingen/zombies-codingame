@@ -10,55 +10,105 @@ namespace Codingame.TargetCalculations
 
     internal class Targets
     {
+        internal static int GetTurnsToTarget(double distanceToTarget) => (int)Math.Ceiling((distanceToTarget - Ranges.ZombieKill) / Ranges.ZombieMove);
+
         internal static double GetDistance(Point p1, Point p2)
         {
             var line = new Point(p1.X - p2.X, p1.Y - p2.Y);
             return Math.Sqrt(Math.Pow(line.X, 2) + Math.Pow(line.Y, 2));
         }
-        internal class TargetInfo
+
+        internal static void CalculateZombieTargetChains(IEnumerable<ZombieNPC> zombies, IEnumerable<LivingNPC> humans)
         {
-            internal TargetInfo(LivingNPC living, ZombieNPC zombie, double distance)
+            foreach (var zombie in zombies)
             {
-                Target = living; Zombie = zombie; Distance = distance;
+                Console.Error.WriteLine($"{zombie.Id} zombie target: {zombie.CurrentTarget.Id}");
+                CalculateZombieTargetChain(zombie, humans.ToList());
+                Console.Error.WriteLine($"{zombie.Id} zombie target chain:");
+                Log.Write(zombie.TargetChain.Select(x => x.NPC.Id));
             }
-            internal LivingNPC Target { get; set; }
-            internal ZombieNPC Zombie { get; set; }
-            internal double Distance { get; set; }
         }
 
-        internal static void SetTargets(LivingNPC shooter, List<LivingNPC> humans, List<ZombieNPC> zombies)
+        internal static void CalculateZombieTargetChain(ZombieNPC zombie, IEnumerable<LivingNPC> humans)
+        {
+            var list = humans.Except(zombie.TargetChain.Select(x => x.NPC));
+            if (!list.Any()) return;
+            var lastNPCOnChain = zombie.TargetChain.LastOrDefault()?.NPC ?? zombie.CurrentTarget;
+            var target = FindClosestTarget(lastNPCOnChain, list);
+            // Log.Write(target);
+            zombie.TargetChain.Push(target);
+            CalculateZombieTargetChain(zombie, humans);
+        }
+
+        private static Target FindClosestTarget(LivingNPC current, IEnumerable<LivingNPC> npcList)
+        {
+            var target = new Target();
+            foreach (var npc in npcList)
+            {
+                var npcDistance = GetDistance(current.Location, npc.Location);
+                if (target.Distance > npcDistance)
+                {
+                    target.Distance = npcDistance;
+                    target.NPC = npc;
+                }
+            }
+
+            return target;
+        }
+
+
+        internal static List<TargetInfo> CalculateZombieTargetList(LivingNPC shooter, List<LivingNPC> humans, List<ZombieNPC> zombies)
         {
             var targetList = new List<TargetInfo>();
             foreach (var zombie in zombies)
             {
                 foreach (var human in humans)
                 {
-                    var intersection = FindClosestIntersection(human.Location, SceneSettings.TargetDiameter, zombie.Location, zombie.NextLocation);
-                    if (intersection != PointF.Empty)
-                    {
-                        var distance = GetDistance(zombie.Location, human.Location);
-                        targetList.Add(new TargetInfo(human, zombie, distance));
-                    }
+                    CalculateDistanceAndTarget(targetList, zombie, human);
                 }
-                var intersection2 = FindClosestIntersection(shooter.Location, SceneSettings.TargetDiameter, zombie.Location, zombie.NextLocation);
-                if (intersection2 != PointF.Empty)
-                {
-                    var distance = GetDistance(zombie.Location, shooter.Location);
-                    targetList.Add(new TargetInfo(shooter, zombie, distance));
-                }
+                CalculateDistanceAndTarget(targetList, zombie, shooter);
             }
-            var prioritizedTargetList = targetList
-                .OrderBy(x => x.Distance)
-                .GroupBy(x => x.Zombie.Id)
-                .Select(x => x.First());
-            // Log.Write(prioritizedTargetList);
-            foreach (var item in prioritizedTargetList)
+            var revisedPriorityList = CalculatePriorities(targetList);
+            UpdateNPCTargets(revisedPriorityList);
+
+            return revisedPriorityList;
+        }
+
+        private static void CalculateDistanceAndTarget(List<TargetInfo> targetList, ZombieNPC zombie, LivingNPC npc)
+        {
+            var intersection = FindClosestIntersection(npc.Location, SceneSettings.TargetDiameter, zombie.Location, zombie.NextLocation);
+            var distanceNpcToZombie = GetDistance(zombie.Location, npc.Location);
+            if (intersection != PointF.Empty)
+            {
+                targetList.Add(new TargetInfo(npc, zombie, distanceNpcToZombie));
+            }
+            UpdateClosestDistanceToZombie(npc, distanceNpcToZombie);
+        }
+
+        private static void UpdateClosestDistanceToZombie(LivingNPC npc, double distanceNpcToZombie)
+        {
+            if (npc.DistanceToClosestZombie > distanceNpcToZombie)
+            {
+                npc.DistanceToClosestZombie = distanceNpcToZombie;
+            }
+        }
+
+        private static void UpdateNPCTargets(List<TargetInfo> revisedPriorityList)
+        {
+            foreach (var item in revisedPriorityList)
             {
                 item.Zombie.CurrentTarget = item.Target;
                 item.Zombie.DistanceToTarget = item.Distance;
                 item.Target.TargetedBy.Add(item.Zombie);
             }
         }
+
+        private static List<TargetInfo> CalculatePriorities(List<TargetInfo> targetList) =>
+            targetList
+                .OrderBy(x => x.Distance)
+                .GroupBy(x => x.Zombie.Id)
+                .Select(x => x.First())
+                .ToList();
 
         internal static PointF FindClosestIntersection(
             Point target, float targetSearchRadius,

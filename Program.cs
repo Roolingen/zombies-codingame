@@ -2,7 +2,6 @@ namespace Codingame
 {
     using System;
     using System.Linq;
-    using Codingame.Constants;
     using Codingame.InputsProcessing;
     using Codingame.Logger;
     using Codingame.Models;
@@ -19,14 +18,22 @@ namespace Codingame
                 inputs = Console.ReadLine()?.Split(' ') ?? Array.Empty<string>();
 
                 var shooter = Inputs.GetShooter(inputs[0], inputs[1]);
-                var humans = Inputs.GetNPCs<LivingNPC>(ref inputs, shooter);
-                var zombies = Inputs.GetNPCs<ZombieNPC>(ref inputs, shooter);
+                var humans = Inputs.GetNPCs<LivingNPC>(ref inputs);
+                humans.Add(shooter);
+                var zombies = Inputs.GetNPCs<ZombieNPC>(ref inputs);
 
                 // var humanStatistics = Stats.GenerateRawStatistics(humans, zombies);
                 // var zombie = zombies.First();
                 // var i1 = Targets.FindClosestIntersection(zombie.Location, Ranges.ShooterKill, shooter.Location, zombie.Location);
-                Targets.SetTargets(shooter, humans, zombies);
-                Log.CurrentTargetInfo(shooter, humans, zombies);
+                var targetList = Targets.CalculateZombieTargetList(shooter, humans, zombies);
+                Targets.CalculateZombieTargetChains(zombies, humans);
+
+
+                // Log.Write(zombies[0].TargetChain.Select(x => x.NPC.Id));
+                // Log.CurrentTargetInfo(shooter, humans, zombies);
+
+                // var lastSavableHuman = humans
+                //     .OrderBy(x => x.KilledInTurns)
 
                 // Log.Write(i1);
 

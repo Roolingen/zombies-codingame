@@ -1,9 +1,8 @@
 namespace Codingame.Models
 {
-    using System;
     using System.Collections.Generic;
     using System.Drawing;
-    using Codingame.Constants;
+    using Codingame.TargetCalculations;
 
     internal class BaseNPC
     {
@@ -14,27 +13,48 @@ namespace Codingame.Models
 
     internal class ZombieNPC : BaseNPC
     {
-        internal LivingNPC? CurrentTarget { get; set; }
+        internal LivingNPC CurrentTarget { get; set; } = new LivingNPC();
+        internal Stack<Target> TargetChain { get; set; } = new Stack<Target>();
         internal double DistanceToTarget { get; set; }
+        internal int TurnsToKill => Targets.GetTurnsToTarget(DistanceToTarget) + 1;
         internal Point NextLocation { get; set; }
     }
 
     internal class LivingNPC : BaseNPC
     {
-        public List<ZombieNPC> TargetedBy { get; set; } = new List<ZombieNPC>();
+        internal List<ZombieNPC> TargetedBy { get; set; } = new List<ZombieNPC>();
+        internal double DistanceToClosestZombie { get; set; }
+        internal int KilledInTurns => Targets.GetTurnsToTarget(DistanceToClosestZombie) + 1;
+        internal int SavedInTurns => Targets.GetTurnsToTarget(DistanceToShooter);
+        internal bool PossibleToSave => SavedInTurns <= KilledInTurns;
+    }
+
+    internal class Target
+    {
+        internal LivingNPC NPC { get; set; } = new LivingNPC();
+        internal double Distance { get; set; } = double.MaxValue;
+        internal int KilledInTurns => Targets.GetTurnsToTarget(Distance) + 1;
+    }
+
+    internal class TargetInfo
+    {
+        internal TargetInfo(LivingNPC living, ZombieNPC zombie, double distance) { Target = living; Zombie = zombie; Distance = distance; }
+        internal LivingNPC Target { get; set; }
+        internal ZombieNPC Zombie { get; set; }
+        internal double Distance { get; set; }
     }
 
     internal class HumanRawStatistic
     {
-        public LivingNPC? Human { get; set; }
-        public ZombieNPC? Zombie { get; set; }
+        internal LivingNPC? Human { get; set; }
+        internal ZombieNPC? Zombie { get; set; }
 
-        public int DistanceZombieToHuman { get; set; }
-        public int DistanceShooterToZombie { get; set; }
-        public int DistanceShooterToHuman { get; set; }
+        internal double DistanceZombieToHuman { get; set; }
+        internal double DistanceShooterToZombie { get; set; }
+        internal double DistanceShooterToHuman { get; set; }
 
-        public int KilledInTurns => (int)Math.Ceiling((DistanceZombieToHuman - Ranges.ZombieKill) / (double)Ranges.ZombieMove) + 1;
-        public int SavedInTurns => (int)Math.Ceiling((DistanceShooterToHuman - Ranges.ShooterKill) / (double)Ranges.ShooterMove);
-        public bool PossibleToSave => SavedInTurns <= KilledInTurns;
+        internal int KilledInTurns => Targets.GetTurnsToTarget(DistanceZombieToHuman) + 1;
+        internal int SavedInTurns => Targets.GetTurnsToTarget(DistanceShooterToHuman);
+        internal bool PossibleToSave => SavedInTurns <= KilledInTurns;
     }
 }
