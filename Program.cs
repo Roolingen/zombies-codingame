@@ -26,7 +26,7 @@
 
                 var target = prioritizedHumans.First().Zombie;
 
-                Console.WriteLine($"{target.NextLocation.X} {target.NextLocation.Y}"); // Your destination coordinates
+                Console.WriteLine($"{target!.NextLocation.X} {target!.NextLocation.Y}"); // Your destination coordinates
             }
         }
     }

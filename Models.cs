@@ -14,8 +14,8 @@ namespace Codingame.Models
 
     internal class NPCStatistic
     {
-        public NPC Human { get; set; }
-        public NPC Zombie { get; set; }
+        public NPC? Human { get; set; }
+        public NPC? Zombie { get; set; }
         public int DistanceZombieToHuman { get; set; }
         public int KilledInTurns => (int)Math.Ceiling((DistanceZombieToHuman - Ranges.ZombieKill) / (double)Ranges.ZombieMove) + 1;
         public int DistanceShooterToZombie { get; set; }

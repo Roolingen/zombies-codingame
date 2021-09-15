@@ -34,7 +34,7 @@ namespace Codingame.Statistics
                 .OrderBy(x => x.KilledInTurns)
                 .ThenBy(x => x.DistanceZombieToHuman)
                 .ThenBy(x => x.DistanceShooterToZombie)
-                .GroupBy(x => x.Human.Id)
+                .GroupBy(x => x.Human!.Id)
                 .Select(x => x.First());
     }
 }
