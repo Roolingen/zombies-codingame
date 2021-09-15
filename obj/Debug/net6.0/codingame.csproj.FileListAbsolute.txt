@@ -1,0 +1,16 @@
+C:\Git\codingame\bin\Debug\net6.0\codingame.exe
+C:\Git\codingame\bin\Debug\net6.0\codingame.deps.json
+C:\Git\codingame\bin\Debug\net6.0\codingame.runtimeconfig.json
+C:\Git\codingame\bin\Debug\net6.0\codingame.dll
+C:\Git\codingame\bin\Debug\net6.0\codingame.pdb
+C:\Git\codingame\obj\Debug\net6.0\codingame.csproj.AssemblyReference.cache
+C:\Git\codingame\obj\Debug\net6.0\codingame.GeneratedMSBuildEditorConfig.editorconfig
+C:\Git\codingame\obj\Debug\net6.0\codingame.AssemblyInfoInputs.cache
+C:\Git\codingame\obj\Debug\net6.0\codingame.AssemblyInfo.cs
+C:\Git\codingame\obj\Debug\net6.0\codingame.ImplicitNamespaceImports.cs
+C:\Git\codingame\obj\Debug\net6.0\codingame.csproj.CoreCompileInputs.cache
+C:\Git\codingame\obj\Debug\net6.0\codingame.dll
+C:\Git\codingame\obj\Debug\net6.0\refint\codingame.dll
+C:\Git\codingame\obj\Debug\net6.0\codingame.pdb
+C:\Git\codingame\obj\Debug\net6.0\codingame.genruntimeconfig.cache
+C:\Git\codingame\obj\Debug\net6.0\ref\codingame.dll
