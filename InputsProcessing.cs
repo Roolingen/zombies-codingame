@@ -5,24 +5,22 @@ namespace Codingame.InputsProcessing
     using System.Drawing;
     using Codingame.Constants;
     using Codingame.Models;
-    using Codingame.DistanceCalculations;
-    using System.Threading.Tasks;
+    using Codingame.TargetCalculations;
 
     internal class Inputs
     {
-        internal static HumanNPC GetShooter(string x, string y) =>
-            new HumanNPC
+        internal static LivingNPC GetShooter(string x, string y) =>
+            new LivingNPC
             {
-                Id = 0,
+                Id = SceneSettings.ShooterId,
                 Location = new Point
                 {
                     X = int.Parse(x),
                     Y = int.Parse(y)
-                },
-                DistanceToShooter = 0
+                }
             };
 
-        internal static List<T> GetNPCs<T>(ref string[] inputs, ShooterNPC shooter) where T : HumanNPC
+        internal static List<T> GetNPCs<T>(ref string[] inputs, LivingNPC shooter) where T : BaseNPC
         {
             var npcs = new List<T>();
             if (!int.TryParse(Console.ReadLine(), out var npcCount)) return npcs;
@@ -34,12 +32,12 @@ namespace Codingame.InputsProcessing
                 var npc = Activator.CreateInstance<T>();
                 npc.Id = int.Parse(inputs[0]);
                 npc.Location = new Point(int.Parse(inputs[1]), int.Parse(inputs[2]));
-                npc.DistanceToShooter = Distances.GetDistance(npc.Location, shooter.Location);
+                npc.DistanceToShooter = Targets.GetDistance(npc.Location, shooter.Location);
 
                 if (npc is ZombieNPC zombieNPC)
                 {
                     zombieNPC.NextLocation = new Point(int.Parse(inputs[3]), int.Parse(inputs[4]));
-                    zombieNPC.ClosestIntersectionNext = Distances.FindClosestIntersection(zombieNPC.NextLocation, Ranges.ShooterKill, shooter.Location, zombieNPC.NextLocation);
+                    // zombieNPC.ClosestIntersectionNext = Distances.FindClosestIntersection(zombieNPC.NextLocation, Ranges.ShooterKill, shooter.Location, zombieNPC.NextLocation);
                 }
 
                 npcs.Add(npc);

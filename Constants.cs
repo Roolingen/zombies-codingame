@@ -1,23 +1,18 @@
 namespace Codingame.Constants
 {
-    internal static class AreaDimensions
+    internal static class SceneSettings
     {
-        const int Width = 16_000;
-        const int Height = 9_000;
-    }
-
-    internal enum NPCTypes
-    {
-        Shooter,
-        Human,
-        Zombie
+        internal const int Width = 16_000;
+        internal const int Height = 9_000;
+        internal const int ShooterId = int.MaxValue;
+        internal const float TargetDiameter = 30f;
     }
 
     internal static class Ranges
     {
-        public const int ShooterMove = 1_000;
-        public const int ShooterKill = 2_000;
-        public const int ZombieMove = 400;
-        public const int ZombieKill = 400;
+        internal const int ShooterMove = 1_000;
+        internal const int ShooterKill = 2_000;
+        internal const int ZombieMove = 400;
+        internal const int ZombieKill = 400;
     }
 }

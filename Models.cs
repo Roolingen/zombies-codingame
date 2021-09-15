@@ -1,29 +1,32 @@
 namespace Codingame.Models
 {
     using System;
+    using System.Collections.Generic;
     using System.Drawing;
     using Codingame.Constants;
 
-    internal class ShooterNPC
+    internal class BaseNPC
     {
-        public Point Location { get; set; }
+        internal int Id { get; set; }
+        internal Point Location { get; set; }
+        internal double DistanceToShooter { get; set; }
     }
 
-    internal class HumanNPC : ShooterNPC
+    internal class ZombieNPC : BaseNPC
     {
-        public int Id { get; set; }
-        public int DistanceToShooter { get; set; }
+        internal LivingNPC? CurrentTarget { get; set; }
+        internal double DistanceToTarget { get; set; }
+        internal Point NextLocation { get; set; }
     }
 
-    internal class ZombieNPC : HumanNPC
+    internal class LivingNPC : BaseNPC
     {
-        public Point NextLocation { get; set; }
-        public PointF ClosestIntersectionNext { get; set; }
+        public List<ZombieNPC> TargetedBy { get; set; } = new List<ZombieNPC>();
     }
 
     internal class HumanRawStatistic
     {
-        public HumanNPC? Human { get; set; }
+        public LivingNPC? Human { get; set; }
         public ZombieNPC? Zombie { get; set; }
 
         public int DistanceZombieToHuman { get; set; }
