@@ -2,38 +2,48 @@ namespace Codingame.Models
 {
     using System.Collections.Generic;
     using System.Drawing;
+    using Codingame.Constants;
     using Codingame.TargetCalculations;
 
     internal class BaseNPC
     {
         internal int Id { get; set; }
         internal Point Location { get; set; }
-        internal double DistanceToShooter { get; set; }
+        // internal double DistanceToShooter { get; set; }
+        internal NPCType NPCType { get; set; }
     }
 
     internal class ZombieNPC : BaseNPC
     {
         internal LivingNPC CurrentTarget { get; set; } = new LivingNPC();
         internal Stack<Target> TargetChain { get; set; } = new Stack<Target>();
-        internal double DistanceToTarget { get; set; }
-        internal int TurnsToKill => Targets.GetTurnsToTarget(DistanceToTarget) + 1;
+        // internal double DistanceToTarget { get; set; }
+        // internal int TurnsToKill => Targets.GetZombieTurnsToTarget(DistanceToTarget) + 1;
         internal Point NextLocation { get; set; }
     }
 
     internal class LivingNPC : BaseNPC
     {
         internal List<ZombieNPC> TargetedBy { get; set; } = new List<ZombieNPC>();
-        internal double DistanceToClosestZombie { get; set; }
-        internal int KilledInTurns => Targets.GetTurnsToTarget(DistanceToClosestZombie) + 1;
-        internal int SavedInTurns => Targets.GetTurnsToTarget(DistanceToShooter);
-        internal bool PossibleToSave => SavedInTurns <= KilledInTurns;
+        // internal double DistanceToClosestZombie { get; set; }
+        // internal int KilledInTurns => Targets.GetZombieTurnsToTarget(DistanceToClosestZombie) + 1;
+        // internal int SavedInTurns => Targets.GetZombieTurnsToTarget(DistanceToShooter);
+        // internal bool PossibleToSave => SavedInTurns <= KilledInTurns;
+    }
+
+    internal class DistanceMatrix
+    {
+        internal BaseNPC NPCHuman { get; set; } = new BaseNPC();
+        internal BaseNPC NPCMixed { get; set; } = new BaseNPC();
+        internal double Distance { get; set; }
+        internal int TurnsToTarget { get; set; }
     }
 
     internal class Target
     {
         internal LivingNPC NPC { get; set; } = new LivingNPC();
         internal double Distance { get; set; } = double.MaxValue;
-        internal int KilledInTurns => Targets.GetTurnsToTarget(Distance) + 1;
+        internal int KilledInTurns;
     }
 
     internal class TargetInfo
@@ -53,8 +63,8 @@ namespace Codingame.Models
         internal double DistanceShooterToZombie { get; set; }
         internal double DistanceShooterToHuman { get; set; }
 
-        internal int KilledInTurns => Targets.GetTurnsToTarget(DistanceZombieToHuman) + 1;
-        internal int SavedInTurns => Targets.GetTurnsToTarget(DistanceShooterToHuman);
+        internal int KilledInTurns => Targets.GetZombieTurnsToTarget(DistanceZombieToHuman) + 1;
+        internal int SavedInTurns => Targets.GetZombieTurnsToTarget(DistanceShooterToHuman);
         internal bool PossibleToSave => SavedInTurns <= KilledInTurns;
     }
 }

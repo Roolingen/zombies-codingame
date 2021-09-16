@@ -7,26 +7,42 @@ namespace Codingame.Logger
 
     internal class Log
     {
-        internal static void Write(object o)
+        internal static void Write<T>(T o)
         {
             Console.Error.WriteLine(JsonSerializer.Serialize(o));
         }
-        internal static void CurrentTargetInfo(LivingNPC shooter, List<LivingNPC> humans, List<ZombieNPC> zombies)
+
+        internal static void WriteTargets(IEnumerable<ZombieNPC> zombies)
         {
-            foreach (var commingZombie in shooter.TargetedBy)
-            {
-                Write($"Shooter is targeted by zombie (Id:{commingZombie.Id}). Distance: {commingZombie.DistanceToTarget}");
-            }
-            foreach (var human in humans)
-            {
-                foreach (var commingZombie in human.TargetedBy)
-                {
-                    Write($"Human (Id:{human.Id}) is targeted by zombie (Id:{commingZombie.Id}). Distance: {commingZombie.DistanceToTarget}");
-                }
-            }
             foreach (var zombie in zombies)
             {
-                Write($"Zombie (Id:{zombie.Id}) current target id:{zombie.CurrentTarget?.Id}). Distance: {zombie.DistanceToTarget}");
+                Write($"Zombie{zombie.Id} target chain:");
+                WriteTargets(zombie.TargetChain);
+            }
+        }
+
+        internal static void WriteTargets(IEnumerable<Target> list)
+        {
+            foreach (var item in list)
+            {
+                Console.Error.WriteLine($"Target: {item.NPC.Id}, turns to target: {item.KilledInTurns}, distance: {(int)item.Distance}");
+            }
+        }
+
+        internal static void WriteHoomans(string whatHoomans, IEnumerable<LivingNPC> list)
+        {
+            Write(whatHoomans);
+            foreach (var item in list)
+            {
+                Console.Error.WriteLine($"Hooman: {item.Id}.");
+            }
+        }
+
+        internal static void WriteMatrix(List<DistanceMatrix> distanceMatrix)
+        {
+            foreach (var item in distanceMatrix)
+            {
+                Console.Error.WriteLine($"{item.NPCHuman.NPCType}{item.NPCHuman.Id}, {item.NPCMixed.NPCType}{item.NPCMixed.Id}, {item.TurnsToTarget}, {(int)item.Distance}");
             }
         }
     }

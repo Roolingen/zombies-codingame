@@ -5,7 +5,7 @@ namespace Codingame.Constants
         internal const int Width = 16_000;
         internal const int Height = 9_000;
         internal const int ShooterId = int.MaxValue;
-        internal const float TargetDiameter = 30f;
+        internal const float TargetDiameter = 40f;
     }
 
     internal static class Ranges
@@ -14,5 +14,12 @@ namespace Codingame.Constants
         internal const int ShooterKill = 2_000;
         internal const int ZombieMove = 400;
         internal const int ZombieKill = 400;
+    }
+
+    internal enum NPCType
+    {
+        Shooter,
+        Human,
+        Zombie
     }
 }

@@ -17,7 +17,8 @@ namespace Codingame.InputsProcessing
                 {
                     X = int.Parse(x),
                     Y = int.Parse(y)
-                }
+                },
+                NPCType = NPCType.Shooter
             };
         }
 
@@ -34,9 +35,15 @@ namespace Codingame.InputsProcessing
                 npc.Id = int.Parse(inputs[0]);
                 npc.Location = new Point(int.Parse(inputs[1]), int.Parse(inputs[2]));
 
+
                 if (npc is ZombieNPC zombieNPC)
                 {
+                    npc.NPCType = NPCType.Zombie;
                     zombieNPC.NextLocation = new Point(int.Parse(inputs[3]), int.Parse(inputs[4]));
+                }
+                else
+                {
+                    npc.NPCType = NPCType.Human;
                 }
 
                 npcs.Add(npc);
