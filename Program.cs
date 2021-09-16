@@ -1,9 +1,12 @@
 namespace Codingame
 {
     using System;
+    using System.Linq;
+    using Codingame.Constants;
     using Codingame.InputsProcessing;
     using Codingame.Logger;
     using Codingame.Models;
+    using Codingame.PriorityProcessor;
     using Codingame.TargetCalculations;
 
     internal class Player
@@ -18,14 +21,26 @@ namespace Codingame
 
                 var shooter = Inputs.GetShooter(inputs[0], inputs[1]);
                 var humans = Inputs.GetNPCs<LivingNPC>(ref inputs);
-                humans.Add(shooter);
                 var zombies = Inputs.GetNPCs<ZombieNPC>(ref inputs);
 
-                var distanceMatrix = Targets.GetDistanceMatrix(humans, zombies);
-                Targets.CalculateZombieTargetChains(zombies, humans, distanceMatrix);
-                Log.WriteTargets(zombies);
+                var zombieMatrix = Targets.GetZombieDistanceMatrix(shooter, humans, zombies);
+                var shooterMatrix = Targets.GetShooterDistanceMatrix(shooter, humans, zombies);
 
-                Console.WriteLine($"{shooter!.Location.X} {shooter!.Location.Y}"); // Your destination coordinates
+                var humanKillList = Priorities.GetKillCountDownForAll(zombieMatrix);
+                var lastToDie = humanKillList.First();
+                Log.WriteMatrix(humanKillList);
+
+                var lastToSave = shooterMatrix.First(x => x.SecondaryNPC.NPCType == NPCType.Human && x.SecondaryNPC.Id == lastToDie.SecondaryNPC.Id);
+                Log.WriteMatrixItem(lastToSave);
+
+                if (lastToDie.TurnsToTarget <= lastToSave.TurnsToTarget)
+                {
+                    Console.WriteLine($"{lastToDie.SecondaryNPC!.Location.X} {lastToDie.SecondaryNPC!.Location.Y}"); // Your destination coordinates
+                }
+                else
+                {
+                    Console.WriteLine($"{shooter!.Location.X} {shooter!.Location.Y}"); // Your destination coordinates
+                }
             }
         }
     }

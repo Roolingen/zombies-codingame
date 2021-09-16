@@ -12,23 +12,6 @@ namespace Codingame.Logger
             Console.Error.WriteLine(JsonSerializer.Serialize(o));
         }
 
-        internal static void WriteTargets(IEnumerable<ZombieNPC> zombies)
-        {
-            foreach (var zombie in zombies)
-            {
-                Write($"Zombie{zombie.Id} target chain:");
-                WriteTargets(zombie.TargetChain);
-            }
-        }
-
-        internal static void WriteTargets(IEnumerable<Target> list)
-        {
-            foreach (var item in list)
-            {
-                Console.Error.WriteLine($"Target: {item.NPC.Id}, turns to target: {item.KilledInTurns}, distance: {(int)item.Distance}");
-            }
-        }
-
         internal static void WriteHoomans(string whatHoomans, IEnumerable<LivingNPC> list)
         {
             Write(whatHoomans);
@@ -38,12 +21,17 @@ namespace Codingame.Logger
             }
         }
 
-        internal static void WriteMatrix(List<DistanceMatrix> distanceMatrix)
+        internal static void WriteMatrix(IEnumerable<DistanceMatrix> distanceMatrix)
         {
             foreach (var item in distanceMatrix)
             {
-                Console.Error.WriteLine($"{item.NPCHuman.NPCType}{item.NPCHuman.Id}, {item.NPCMixed.NPCType}{item.NPCMixed.Id}, {item.TurnsToTarget}, {(int)item.Distance}");
+                WriteMatrixItem(item);
             }
+        }
+
+        internal static void WriteMatrixItem(DistanceMatrix item)
+        {
+            Console.Error.WriteLine($"{item.PrimaryNPC.NPCType}{item.PrimaryNPC.Id} can reach {item.SecondaryNPC.NPCType}{item.SecondaryNPC.Id} in {item.TurnsToTarget} turns ({(int)item.Distance} units away)");
         }
     }
 }
