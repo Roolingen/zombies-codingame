@@ -4,6 +4,7 @@ namespace Codingame.TargetCalculations
     using System.Collections.Generic;
     using System.Drawing;
     using Codingame.Constants;
+    using Codingame.Logger;
     using Codingame.Models;
 
     internal class Targets
@@ -11,10 +12,30 @@ namespace Codingame.TargetCalculations
         internal static int GetZombieTurnsToTarget(double distanceToTarget) => (int)Math.Ceiling(distanceToTarget / Ranges.ZombieMove);
         internal static int GetShooterTurnsToTarget(double distanceToTarget) => (int)Math.Ceiling((distanceToTarget - Ranges.ShooterKill) / Ranges.ShooterMove);
 
+        private static Point GetVector(Point p1, Point p2) => new Point(p2.X - p1.X, p2.Y - p1.Y);
+        internal static double GetDistance(Point vector) => Math.Sqrt(Math.Pow(vector.X, 2) + Math.Pow(vector.Y, 2));
         internal static double GetDistance(Point p1, Point p2)
         {
-            var line = new Point(p1.X - p2.X, p1.Y - p2.Y);
-            return Math.Sqrt(Math.Pow(line.X, 2) + Math.Pow(line.Y, 2));
+            var vector = GetVector(p1, p2);
+            return Math.Sqrt(Math.Pow(vector.X, 2) + Math.Pow(vector.Y, 2));
+        }
+
+        internal static Point GetCoordinates(Point p1, Point p2, double distance)
+        {
+            if (p1 == p2) return p1;
+            Log.Write($"p1 x:{p1.X} y:{p1.Y} - p2 x:{p2.X} y:{p2.Y}. Distance: {distance}");
+            var vector = GetVector(p1, p2);
+            Log.Write($"Vector: {vector}");
+            var fullDistance = GetDistance(vector);
+            Log.Write($"Full distance: {fullDistance}");
+            var requiredDistance = fullDistance / distance;
+            Log.Write($"Required distance: {requiredDistance}");
+            return new Point((int)Math.Abs(p1.X + vector.X / requiredDistance), (int)Math.Abs(p1.Y + vector.Y / requiredDistance));
+        }
+
+        internal static Point GetMaxDistanceFromTarget(DistanceMatrix lastToDie, DistanceMatrix lastToSave, Point target)
+        {
+            return GetCoordinates(lastToSave.SecondaryNPC.Location, target, lastToDie.TurnsToTarget * Ranges.ShooterMove);
         }
 
         internal static List<DistanceMatrix> GetZombieDistanceMatrix(LivingNPC shooter, IEnumerable<LivingNPC> humans, IEnumerable<ZombieNPC> zombies)

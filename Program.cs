@@ -26,21 +26,24 @@ namespace Codingame
                 var zombieMatrix = Targets.GetZombieDistanceMatrix(shooter, humans, zombies);
                 var shooterMatrix = Targets.GetShooterDistanceMatrix(shooter, humans, zombies);
 
-                var humanKillList = Priorities.GetKillCountDownForAll(zombieMatrix);
-                var lastToDie = humanKillList.First();
-                Log.WriteMatrix(humanKillList);
-
+                var lastToDie = Priorities.GetKillCountDownForAll(zombieMatrix).ToList().First();
                 var lastToSave = shooterMatrix.First(x => x.SecondaryNPC.NPCType == NPCType.Human && x.SecondaryNPC.Id == lastToDie.SecondaryNPC.Id);
-                Log.WriteMatrixItem(lastToSave);
 
-                if (lastToDie.TurnsToTarget <= lastToSave.TurnsToTarget)
+                var target = Priorities.GetNextCoordinates(zombieMatrix);
+                if (Targets.GetDistance(lastToSave.SecondaryNPC.Location, target) > lastToSave.Distance && zombies.Count() > 1)
                 {
-                    Console.WriteLine($"{lastToDie.SecondaryNPC!.Location.X} {lastToDie.SecondaryNPC!.Location.Y}"); // Your destination coordinates
+                    target = Targets.GetMaxDistanceFromTarget(lastToDie, lastToSave, target);
                 }
-                else
-                {
-                    Console.WriteLine($"{shooter!.Location.X} {shooter!.Location.Y}"); // Your destination coordinates
-                }
+                Log.Write($"-----------------------------");
+                Log.Write($"lastToDie.SecondaryNPC.Id: {lastToDie.SecondaryNPC.Id}.");
+                Log.Write($"lastToDie.TurnsToTarget: {lastToDie.TurnsToTarget}.");
+                Log.Write($"lastToSave.SecondaryNPC.Id: {lastToSave.SecondaryNPC.Id}.");
+                Log.Write($"lastToSave.TurnsToTarget: {lastToSave.TurnsToTarget}.");
+                Log.Write($"-----------------------------");
+
+                Console.WriteLine(lastToDie.TurnsToTarget > lastToSave.TurnsToTarget
+                        ? $"{target.X} {target.Y}"
+                        : $"{lastToDie.SecondaryNPC!.Location.X} {lastToDie.SecondaryNPC!.Location.Y}");
             }
         }
     }
